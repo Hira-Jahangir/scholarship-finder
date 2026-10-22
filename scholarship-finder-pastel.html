@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scholarship Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="genz.css">
+</head>
+<body>
+<div class="doodles" aria-hidden="true">
+<svg class="d1" viewBox="0 0 48 48"><path d="M24 3c2 12 9 19 21 21-12 2-19 9-21 21-2-12-9-19-21-21 12-2 19-9 21-21z" fill="#ffe27a" stroke="#2b2660" stroke-width="2.5" stroke-linejoin="round"/></svg>
+<svg class="d2" viewBox="0 0 120 30"><path d="M3 18c10-16 18 14 28 0s18 14 28 0 18 14 28 0 18 14 28 0" fill="none" stroke="#2b2660" stroke-width="3" stroke-linecap="round"/></svg>
+<svg class="d3" viewBox="0 0 64 64"><path d="M32 12L4 26l28 14 28-14z" fill="#cdbdff" stroke="#2b2660" stroke-width="3" stroke-linejoin="round"/><path d="M16 33v12c0 4 8 8 16 8s16-4 16-8V33" fill="#bff0d8" stroke="#2b2660" stroke-width="3" stroke-linejoin="round"/><path d="M60 26v16" stroke="#2b2660" stroke-width="3" stroke-linecap="round"/></svg>
+<svg class="d4" viewBox="0 0 64 64"><path d="M12 52l4-14 30-30 10 10-30 30z" fill="#ffd6c2" stroke="#2b2660" stroke-width="3" stroke-linejoin="round"/><path d="M12 52l4-14 10 10z" fill="#fff1b8" stroke="#2b2660" stroke-width="3" stroke-linejoin="round"/><path d="M40 14l10 10" stroke="#2b2660" stroke-width="3"/></svg>
+<svg class="d5" viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="#2b2660" stroke-width="3" stroke-dasharray="4 7" stroke-linecap="round"/></svg>
+<svg class="d6" viewBox="0 0 60 60"><path d="M30 8v44M8 30h44" stroke="#6b5bd6" stroke-width="7" stroke-linecap="round"/></svg>
+<svg class="d7" viewBox="0 0 48 48"><path d="M24 3c2 12 9 19 21 21-12 2-19 9-21 21-2-12-9-19-21-21 12-2 19-9 21-21z" fill="#bfe3ff" stroke="#2b2660" stroke-width="2.5" stroke-linejoin="round"/></svg>
+</div>
+<main>
+<header>
+<p class="kicker">psst… free money for college ✨</p>
+<h1>Scholarship <span class="hl">Finder</span></h1>
+<p class="sub">Enter your details. See which scholarships you qualify for, what’s missing for the others, and get a ready application letter.</p>
+<ol class="steps"><li>Enter your details</li><li>See your matches</li><li>Get your letter</li></ol>
+</header>
+<div class="note">Practice version: the scholarships below are made-up sample data, not real offers.</div>
+
+<form id="f">
+<label>Your name<input id="name" required placeholder="e.g. Ayesha Khan"></label>
+<div class="row">
+<label>Marks (%)<input id="marks" type="number" min="0" max="100" required placeholder="72"></label>
+<label>Family income per month (Rs.)<input id="inc" type="number" min="0" required placeholder="45000"></label>
+</div>
+<div class="row">
+<label>Field of study<select id="field"><option>Computer Science</option><option>Engineering</option><option>Business</option><option>Medical</option><option>Science</option><option>Arts &amp; Humanities</option></select></label>
+<label>Province<select id="prov"><option>Punjab</option><option>Sindh</option><option>Khyber Pakhtunkhwa</option><option>Balochistan</option><option>Islamabad</option><option>AJK / Gilgit-Baltistan</option></select></label>
+</div>
+<button type="submit">Find my scholarships</button>
+</form>
+
+<div id="out"></div>
+</main>
+
+<script>
+// Paste your Gemma API key between the quotes below. Keep this file private; never upload it to GitHub.
+var API_KEY="your api key";
+var MODEL="gemma-4-26b-a4b-it"; // if it stops working, change this name
+var SCH=[
+{n:"Merit Star Scholarship",min:80,inc:null,fields:null,prov:null,dl:"2026-11-30",amt:"Rs. 150,000 per year"},
+{n:"Need-Based Education Fund",min:60,inc:50000,fields:null,prov:null,dl:"2026-11-20",amt:"Full tuition"},
+{n:"STEM Future Scholars",min:65,inc:100000,fields:["Computer Science","Engineering","Science"],prov:null,dl:"2026-12-05",amt:"Rs. 120,000 per year"},
+{n:"Business Leaders Award",min:70,inc:120000,fields:["Business"],prov:null,dl:"2026-12-10",amt:"Rs. 100,000 per year"},
+{n:"Future Doctors Aid",min:75,inc:90000,fields:["Medical"],prov:null,dl:"2026-12-15",amt:"Rs. 180,000 per year"},
+{n:"Punjab Merit and Need Grant",min:70,inc:80000,fields:null,prov:"Punjab",dl:"2026-11-25",amt:"Rs. 90,000 per year"},
+{n:"Sindh Scholars Program",min:65,inc:75000,fields:null,prov:"Sindh",dl:"2026-12-01",amt:"Rs. 90,000 per year"},
+{n:"Khyber Pakhtunkhwa Rising Fund",min:60,inc:70000,fields:null,prov:"Khyber Pakhtunkhwa",dl:"2026-11-28",amt:"Rs. 85,000 per year"},
+{n:"Balochistan Talent Support",min:55,inc:60000,fields:null,prov:"Balochistan",dl:"2026-12-20",amt:"Rs. 95,000 per year"},
+{n:"Open Access Grant",min:50,inc:30000,fields:null,prov:null,dl:"2026-11-18",amt:"Rs. 60,000 per year"}
+];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function days(d){var n=Math.ceil((new Date(d+"T23:59:59")-new Date())/86400000);return n<0?"Deadline passed":n+" days left"}
+function check(s,u){
+ var fails=[],hard=false;
+ if(u.marks<s.min)fails.push("Needs "+s.min+"% marks (you have "+u.marks+"%, so "+(s.min-u.marks)+"% more)");
+ if(s.inc&&u.inc>s.inc)fails.push("Family income must be under Rs. "+s.inc.toLocaleString()+" per month");
+ if(s.fields&&s.fields.indexOf(u.field)<0){fails.push("Only for: "+s.fields.join(", "));hard=true}
+ if(s.prov&&s.prov!==u.prov){fails.push("Only for students from "+s.prov);hard=true}
+ var close=(u.marks>=s.min-10)&&(!s.inc||u.inc<=s.inc*1.3);
+ return{fails:fails,status:fails.length===0?"match":(!hard&&close?"almost":"no")};
+}
+function reasons(s,u){
+ var r=["Your marks ("+u.marks+"%) meet the minimum of "+s.min+"%"];
+ if(s.inc)r.push("Your family income is within the limit of Rs. "+s.inc.toLocaleString()+" per month");
+ if(s.fields)r.push("You study "+u.field);
+ if(s.prov)r.push("You are from "+u.prov);
+ return r;
+}
+function letter(s,u){
+ return "Dear Scholarship Committee,\n\nI am writing to apply for the "+s.n+". I am a "+u.field+" student from "+u.prov+" with "+u.marks+"% marks in my most recent exam. My family’s monthly income is Rs. "+u.inc.toLocaleString()+", and this scholarship would help me continue my studies without interruption.\n\nI meet the requirements:\n- "+reasons(s,u).join("\n- ")+"\n\nI will provide all required documents on request. Thank you for considering my application.\n\nSincerely,\n"+u.name;
+}
+function docs(s){
+ var d=["CNIC or B-Form copy","Latest transcript or result card","Family income certificate","Two passport-size photos"];
+ if(s.prov)d.push("Domicile certificate ("+s.prov+")");
+ return d;
+}
+var U=null;
+function render(){
+ var m=[],a=[];
+ SCH.forEach(function(s,i){var c=check(s,U);if(c.status==="match")m.push([s,i,c]);else if(c.status==="almost")a.push([s,i,c])});
+ var h="<h2>You qualify for "+m.length+"</h2>";
+ if(!m.length)h+="<p class=\"empty\">No full matches yet. Check the “almost” list below.</p>";
+ m.forEach(function(x){var s=x[0];
+  h+="<div class=\"card\"><span class=\"tag\">You qualify</span><h3>"+esc(s.n)+"</h3><p class=\"meta\">"+esc(s.amt)+" · "+days(s.dl)+"</p><ul>"+reasons(s,U).map(function(r){return"<li>"+esc(r)+"</li>"}).join("")+"</ul>"+
+  "<strong>Documents to prepare</strong><ul>"+docs(s).map(function(d){return"<li>"+esc(d)+"</li>"}).join("")+"</ul>"+
+  "<button class=\"ghost\" data-i=\""+x[1]+"\">Write my application letter</button><div id=\"L"+x[1]+"\"></div></div>"});
+ if(a.length){h+="<h2>Almost there</h2>";
+  a.forEach(function(x){var s=x[0];
+   h+="<div class=\"card almost\"><span class=\"tag\">Almost</span><h3>"+esc(s.n)+"</h3><p class=\"meta\">"+esc(s.amt)+" · "+days(s.dl)+"</p><ul>"+x[2].fails.map(function(r){return"<li>"+esc(r)+"</li>"}).join("")+"</ul></div>"})}
+ var o=document.getElementById("out");o.innerHTML=h;
+ o.scrollIntoView({behavior:"smooth"});
+}
+document.getElementById("f").addEventListener("submit",function(e){
+ e.preventDefault();
+ U={name:document.getElementById("name").value.trim(),marks:+document.getElementById("marks").value,inc:+document.getElementById("inc").value,field:document.getElementById("field").value,prov:document.getElementById("prov").value};
+ render();
+});
+async function askGemma(s,u){
+ var key=API_KEY;
+ if(!key||key==="PASTE_YOUR_KEY_HERE")throw new Error("No API key in the code");
+ var prompt="You are a friendly scholarship advisor helping a student in Pakistan. Student: name "+u.name+", "+u.marks+"% marks, field "+u.field+", province "+u.prov+", family income Rs. "+u.inc+" per month. Scholarship: "+s.n+" ("+s.amt+"). Write two parts. Part 1 starts with the line LETTER: then a formal, warm application letter of about 150 words signed with the student name. Part 2 starts with the line TIPS: then 3 short bullet tips in very simple English about why the student qualifies and how to make the application stronger. No other text.";
+ var r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+MODEL+":generateContent?key="+encodeURIComponent(key),{signal:AbortSignal.timeout(15000),method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+ var d=await r.json();
+ if(!r.ok)throw new Error((d.error&&d.error.message)||"API error");
+ return d.candidates[0].content.parts.filter(function(p){return !p.thought}).map(function(p){return p.text||""}).join("");
+}
+document.getElementById("out").addEventListener("click",async function(e){
+ var b=e.target.closest("button[data-i]");if(!b)return;
+ var i=+b.getAttribute("data-i"),box=document.getElementById("L"+i),letterText,tips="",src;
+ b.style.display="none";
+ box.innerHTML="<p class=\"src\">Gemma is writing your letter…</p>";
+ try{
+  var out=await askGemma(SCH[i],U),k=out.search(/TIPS:/i);
+  letterText=(k>=0?out.slice(0,k):out).replace(/^\s*LETTER:\s*/i,"").trim();
+  if(k>=0)tips=out.slice(k).replace(/^TIPS:\s*/i,"").trim();
+  if(!letterText)throw new Error("Empty reply");
+  src="";
+ }catch(err){
+  letterText=letter(SCH[i],U);
+  src="Backup template used (Gemma problem: "+err.message+")";
+ }
+ box.innerHTML="<div class=\"letter\">"+esc(letterText)+"</div>"+(tips?"<div class=\"tips\"><strong>Tips</strong>\n"+esc(tips)+"</div>":"")+"<p class=\"src\">"+esc(src)+"</p><p><button class=\"ghost\" data-c=\""+i+"\">Copy letter</button></p>";
+});
+document.getElementById("out").addEventListener("click",function(e){
+ var b=e.target.closest("button[data-c]");if(!b)return;
+ var t=document.getElementById("L"+b.getAttribute("data-c")).querySelector(".letter").textContent;
+ try{navigator.clipboard.writeText(t).then(function(){b.textContent="Copied"},function(){b.textContent="Select the text to copy"})}catch(x){b.textContent="Select the text to copy"}
+});
+</script>
+</body>
+</html>
