@@ -45,7 +45,7 @@
 
 <script>
 // Paste your Gemma API key between the quotes below. Keep this file private; never upload it to GitHub.
-var API_KEY="your api key";
+var API_KEY="";
 var MODEL="gemma-4-26b-a4b-it"; // if it stops working, change this name
 var SCH=[
 {n:"Merit Star Scholarship",min:80,inc:null,fields:null,prov:null,dl:"2026-11-30",amt:"Rs. 150,000 per year"},
@@ -128,7 +128,7 @@ document.getElementById("out").addEventListener("click",async function(e){
   src="";
  }catch(err){
   letterText=letter(SCH[i],U);
-  src="Backup template used (Gemma problem: "+err.message+")";
+  src="This public demo uses a template letter. The AI-written version works when run with an API key.";
  }
  box.innerHTML="<div class=\"letter\">"+esc(letterText)+"</div>"+(tips?"<div class=\"tips\"><strong>Tips</strong>\n"+esc(tips)+"</div>":"")+"<p class=\"src\">"+esc(src)+"</p><p><button class=\"ghost\" data-c=\""+i+"\">Copy letter</button></p>";
 });
