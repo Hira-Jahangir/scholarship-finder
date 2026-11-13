@@ -1,4 +1,4 @@
-# 🎓 Scholarship Finder
+# 🎓 **Buddy Scholar**
 
 An AI-built tool that helps students find scholarships they qualify for and generates application letters.
 
